@@ -1,0 +1,10 @@
+data
+.git
+.github
+.gitattributes
+.gitignore
+.editorconfig
+.env.example
+.prettierrc
+LICENSE.md
+README.md
