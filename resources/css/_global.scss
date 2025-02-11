@@ -1,0 +1,17 @@
+$primary: #11101D;
+$glass: rgba($primary, 0.3);
+
+:root,
+.root,
+#root,
+#docs-root {
+	--primary-color: #{$primary};
+	--secondary-color: #000;
+	--skeleton-bg-dark: '';
+	--skeleton-bg-light: '';
+	--glass-bg: #{$glass}
+}
+
+html {
+	scroll-behavior: smooth;
+}
