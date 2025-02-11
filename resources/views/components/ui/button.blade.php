@@ -2,10 +2,12 @@
   'label' => null,
   'url' => null,
   'tag' => 'button',
+  'class' => '',
   'size' => 'sm',
   'color' => 'primary',
   'icon' => null,
   'iconRight' => null,
+  'svg' => null
 ])
 
 @php($iconSize = match ($size) {
@@ -25,7 +27,7 @@
 })
 
 @php($color = match ($color) {
-  'primary' => 'bg-primary-500 hover:bg-primary-600 text-white',
+  'primary' => 'bg-primary-100 hover:bg-primary-600 text-white',
   'green' => 'bg-green-500 hover:bg-green-600 text-white',
   'gray' => 'bg-gray-500 hover:bg-gray-600 text-white',
   default => 'bg-primary-500 hover:bg-primary-600 text-white',
@@ -34,17 +36,21 @@
 @php($tag = $url ? 'a' : $tag)
 
 @if ($url)
-  @php($attributes = $attributes->merge(['href' => $url]))
+	@php($attributes = $attributes->merge(['href' => $url]))
 @endif
 
-<{{ $tag }} {{ $attributes->merge(['class' => "inline-flex items-center justify-center rounded-md transition-colors {$size} {$color}"]) }}>
-  @if ($icon)
-    <x-icon :name="$icon" class="{{ $iconSize }} mr-2" />
-  @endif
+<{{ $tag }} {{ $attributes->merge(['class' => "inline-flex items-center justify-center rounded-md transition-colors duration-400 ease {$size} {$color} {$class}"]) }}>
+	@if ($icon)
+		<x-icon :name="$icon" class="{{ $iconSize }} mr-2" />
+	@endif
 
-  <span>{{ $label ?? $slot }}</span>
+	@if ($svg)
+		{{ $svg }}
+	@endif
 
-  @if ($iconRight)
-    <x-icon :name="$iconRight" class="{{ $iconSize }} ml-2" />
-  @endif
+	<span>{{ $label ?? $slot }}</span>
+
+	@if ($iconRight)
+		<x-icon :name="$iconRight" class="{{ $iconSize }} ml-2" />
+	@endif
 </{{ $tag }}>

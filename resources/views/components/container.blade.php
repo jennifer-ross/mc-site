@@ -1,4 +1,4 @@
-@props(['size' => 'md'])
+@props(['size' => 'md', 'class' => ''])
 
 @php($size = match ($size) {
   'sm' => 'max-w-4xl',
@@ -7,6 +7,6 @@
   default => 'max-w-4xl',
 })
 
-<div {{ $attributes->merge(['class' => "{$size} px-6 mx-auto"]) }}>
+<div {{ $attributes->merge(['class' => "{$size} px-6 mx-auto {$class}"]) }}>
   {{ $slot }}
 </div>
