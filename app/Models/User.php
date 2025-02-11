@@ -4,12 +4,29 @@ namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * Class User
+ *
+ * @property int id
+ * @property string name
+ * @property string email
+ * @property string password
+ * @property string remember_token
+ * @property Carbon|null email_verified_at
+ * @property Carbon|null created_at
+ * @property Carbon|null updated_at
+ * @property array<Post> $posts
+ * @property array<Role> $roles
+ */
 class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
@@ -43,6 +60,8 @@ class User extends Authenticatable implements FilamentUser
     protected function casts(): array
     {
         return [
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
@@ -53,16 +72,16 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return $this->hasRole('super_admin', 'web');
     }
 
     /**
      * The posts that belong to the user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
-    public function posts()
-    {
+    public function posts(): HasMany
+	{
         return $this->hasMany(Post::class);
     }
 }
