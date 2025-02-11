@@ -3,6 +3,14 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    <IfModule mod_headers.c>
+        Header set Accept-Ranges bytes
+
+        <FilesMatch "\.(mp4|webm|ogg)$">
+            Header set Cache-Control "max-age=31536000, public"
+        </FilesMatch>
+    </IfModule>
+
     RewriteEngine On
 
     # Handle Authorization Header
