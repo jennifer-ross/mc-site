@@ -8,3 +8,5 @@ import Tooltip from '@ryangjchandler/alpine-tooltip'
 Alpine.plugin(Tooltip)
 
 Livewire.start()
+
+import './echo.js'
