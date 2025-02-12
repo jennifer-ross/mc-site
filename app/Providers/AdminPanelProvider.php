@@ -45,7 +45,9 @@ class AdminPanelProvider extends PanelProvider
 
                 ResourceLockPlugin::make(),
 
-                FilamentSpatieLaravelBackupPlugin::make(),
+                FilamentSpatieLaravelBackupPlugin::make()
+					 ->timeout(360)
+					->usingQueue('backup-queue'),
 
                 CuratorPlugin::make()
                     ->label('Media')

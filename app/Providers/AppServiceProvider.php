@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\View;
 use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,8 +17,13 @@ class AppServiceProvider extends ServiceProvider
 	public function register(): void
 	{
 		FilamentView::registerRenderHook(
-			'panels::head.start',
+			PanelsRenderHook::HEAD_START,
 			fn(): string => '<meta name="robots" content="noindex,nofollow">'
+		);
+
+		FilamentView::registerRenderHook(
+			PanelsRenderHook::BODY_END,
+			fn(): View => view('components.scripts')
 		);
 	}
 
