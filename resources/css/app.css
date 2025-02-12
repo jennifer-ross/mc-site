@@ -1,11 +1,15 @@
+@import "tailwindcss-intersect";
 @import 'tippy.js/dist/tippy.css';
 @import 'css-skeletons';
 @import "_global.scss";
 @import "_components.scss";
 
+@plugin "tailwindcss-motion";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 /*@import "tailwindcss";*/
 

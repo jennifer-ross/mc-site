@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {DefaultColors} */
 
 const colors = require('tailwindcss/colors')
 
@@ -28,9 +28,7 @@ module.exports = {
 					900: '#08070D',
 				},
 			},
-			text: {
-
-			},
+			text: {},
 			gridTemplateColumns: {
 				// Column grid
 				'16': 'repeat(16, minmax(0, 1fr))',
@@ -44,9 +42,14 @@ module.exports = {
 				'3lg': '0px 25px 35px 0 rgb(0 0 0 / 0.03), 0px 0px 5px 0 rgb(0 0 0 / 0.05)',
 			},
 			fontFamily: {
-				"poppins": ['Poppins', 'sans-serif']
-			}
+				'poppins': ['Poppins', 'sans-serif'],
+			},
 		},
 	},
-	plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
+	plugins: [
+		require('@tailwindcss/forms'),
+		require('@tailwindcss/typography'),
+		require('tailwindcss-motion'),
+		require('tailwindcss-intersect'),
+	],
 }
