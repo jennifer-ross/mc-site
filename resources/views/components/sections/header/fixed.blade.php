@@ -9,14 +9,14 @@
 			>
 				<x-logo />
 			</a>
-			<div>
-				<x-button
-					size="xs"
-					url="#how-to-play"
-				>
-					Modal example
-				</x-button>
-			</div>
+{{--			<div>--}}
+{{--				<x-ui.button--}}
+{{--					size="xs"--}}
+{{--					url="#how-to-play"--}}
+{{--				>--}}
+{{--					Modal example--}}
+{{--				</x-ui.button>--}}
+{{--			</div>--}}
 		</nav>
 	</x-container>
 </header>

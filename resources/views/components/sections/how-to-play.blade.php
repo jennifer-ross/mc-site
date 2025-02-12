@@ -1,3 +1,11 @@
-<div class="how-to-play" id="how-to-play">
-	How to play
-</div>
+<x-sectionHome position="center">
+	<x-slot:title>
+		Как начать играть?
+
+		{{--		{{ __('stability.title') }}--}}
+	</x-slot:title>
+	<x-slot:description>
+		{{--		{{ __('stability.description') }}--}}
+		Наш сервер ориентирован на любителей и ценителей ванильного Minecraft. Мы прислушиваемся к пожеланиям игроков и постоянно совершенствуем геймплей, создавая необходимые условия для комфортного выживания и не ломая баланс его основного геймплея. Мы всегда поддерживаем уютную и дружескую атмосферу.
+	</x-slot:description>
+</x-sectionHome>

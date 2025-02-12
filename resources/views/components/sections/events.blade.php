@@ -1,10 +1,10 @@
-<x-sectionHome :image=2>
+<x-sectionHome position="left" :image=2>
 	<x-slot:title>
-		Что такое {{ config('app.name') }}?
-{{--		{{ __('stability.title') }}--}}
+		Частые ивенты
+		{{--		{{ __('stability.title') }}--}}
 	</x-slot:title>
 	<x-slot:description>
-{{--		{{ __('stability.description') }}--}}
+		{{--		{{ __('stability.description') }}--}}
 		Наш сервер ориентирован на любителей и ценителей ванильного Minecraft. Мы прислушиваемся к пожеланиям игроков и постоянно совершенствуем геймплей, создавая необходимые условия для комфортного выживания и не ломая баланс его основного геймплея. Мы всегда поддерживаем уютную и дружескую атмосферу.
 	</x-slot:description>
 </x-sectionHome>

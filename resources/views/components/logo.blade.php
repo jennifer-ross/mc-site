@@ -1,4 +1,10 @@
 <div class="text-2xl inline-flex gap-2">
-	<img class="lazy size-8" src="{{ asset('img/blank.webp') }}" alt="{{ config('app.name') }}" data-src="{{ asset('img/logo.webp') }}">
-  {{ config('app.name') }}
+	<x-img
+		class="size-8"
+		:media=1
+		format="webp"
+		quality="80"
+		alt="{{ config('app.name') }}"
+	/>
+	{{ config('app.name') }}
 </div>

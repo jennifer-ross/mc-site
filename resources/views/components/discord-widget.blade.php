@@ -11,7 +11,7 @@
      }"
 >
 	<template x-if="!loaded">
-		<x-loader/>
+		<x-ui.loader/>
 	</template>
 	<iframe
 		x-transition
