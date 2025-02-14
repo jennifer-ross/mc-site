@@ -7,7 +7,7 @@
 		   preload="none"
 		   disablepictureinpicture
 		   disableremoteplayback></video>
-	<div class="absolute left-0 top-0 w-full h-full bg-gradient-to-b from-transparent to-primary-900">&nbsp;</div>
+	<div class="absolute left-0 top-0 w-full h-full bg-gradient-to-b from-transparent to-primary-900" style="--tw-gradient-from: rgba(8,7,13,0.35)">&nbsp;</div>
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
 			const videoEl = document.querySelector('.bg-home-video video')
