@@ -24,6 +24,7 @@
 	},
 	"dependencies": {
 		"@tailwindcss/postcss": "^4.0.5",
+		"alpine-magic-helpers": "^1.2.2",
 		"css-skeletons": "^1.0.7",
 		"tippy.js": "^6.3.7"
 	}
