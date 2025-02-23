@@ -27,6 +27,21 @@ module.exports = {
 					800: '#0F0E1A',
 					900: '#08070D',
 				},
+				lightblue: {
+					DEFAULT: '#fff',
+					light: '#fff',
+					dark: '#fff',
+					50: '#E4E9F7',
+					100: '#E0E5F6',
+					200: '#D0D9F1',
+					300: '#C0CCEC',
+					400: '#B0BFE8',
+					500: '#A1B2E3',
+					600: '#91A6De',
+					700: '#8199D9',
+					800: '#728CD5',
+					900: '#627FD0',
+				}
 			},
 			text: {},
 			gridTemplateColumns: {

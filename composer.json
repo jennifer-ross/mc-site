@@ -26,6 +26,7 @@
 		"laravel/socialite": "^5.17",
 		"laravel/tinker": "^2.9",
 		"livewire/livewire": "^3.3",
+		"mallardduck/blade-boxicons": "^2.4",
 		"pboivin/filament-peek": "^2.2",
 		"romanzipp/laravel-seo": "^2.6",
 		"shuvroroy/filament-spatie-laravel-backup": "^2.2",
