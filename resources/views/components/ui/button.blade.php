@@ -48,7 +48,11 @@
 		{{ $svg }}
 	@endif
 
-	<span>{{ $label ?? $slot }}</span>
+	@if($label)
+		<span>{{ $label }}</span>
+	@elseif($slot)
+		{{ $slot }}
+	@endif
 
 	@if ($iconRight)
 		<x-icon :name="$iconRight" class="{{ $iconSize }} ml-2" />

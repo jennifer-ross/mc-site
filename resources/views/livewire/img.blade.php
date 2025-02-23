@@ -39,6 +39,8 @@
 			sizes="{{ $sizes }}"
 			@endif
 			{{ $attributes->filter(fn ($attr) => $attr !== '') }}
+			draggable="false"
+			loading="lazy"
 		/>
 	@else
 		<x-curator::document-image

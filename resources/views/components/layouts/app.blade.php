@@ -21,13 +21,15 @@
 	}
 @endphp
 
-@if($style !== 'home')
-	<div class="flex flex-col min-h-screen">
+{{--@if($style !== 'home')--}}
+@if(Auth::check())
+	<div class="flex flex-col min-h-screen bg-lightblue-50">
 		<x-sections.header />
 
-		<div class="flex flex-1 relative">
+		<main class="flex flex-1 relative">
+			<x-sidebars.left/>
 			{{ $slot }}
-		</div>
+		</main>
 
 		<x-sections.footer />
 	</div>
