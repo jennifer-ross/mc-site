@@ -6,11 +6,11 @@ use Illuminate\Http\Request;
 
 class VideoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request, string $filename)
-    {
+	/**
+	 * Display a listing of the resource.
+	 */
+	public function index(Request $request, string $filename)
+	{
 		$path = public_path("video/{$filename}");
 
 		if (!file_exists($path)) {
@@ -48,7 +48,7 @@ class VideoController extends Controller
 			$headers['Content-Range'] = "bytes $start-" . ($start + $length - 1) . "/$size";
 		}
 
-		return response()->stream(function() use ($stream, $length) {
+		return response()->stream(function () use ($stream, $length) {
 			$chunkSize = 1024 * 1024; // 1MB chunks
 			$bytesSent = 0;
 
@@ -61,5 +61,5 @@ class VideoController extends Controller
 
 			fclose($stream);
 		}, $range ? 206 : 200, $headers);
-    }
+	}
 }
