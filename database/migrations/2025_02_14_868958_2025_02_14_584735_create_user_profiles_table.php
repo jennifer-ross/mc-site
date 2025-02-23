@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_profiles', function (Blueprint $table) {
             $table->id();
-			$table->foreignId('user_id')->index();
+            $table->foreignId('user_id')->index();
             $table->string('discord_id')->unique();
             $table->string('minecraft_id')->unique()->nullable();
             $table->string('minecraft_name')->nullable();
