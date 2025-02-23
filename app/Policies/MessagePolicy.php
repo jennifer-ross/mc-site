@@ -3,34 +3,27 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Post;
+use App\Models\Message;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class PostPolicy
+class MessagePolicy
 {
     use HandlesAuthorization;
-
-	private function isPostOwner(User $user, Post $post)
-	{
-		if ($user->id !== $post->user->id) {
-			return false;
-		}
-	}
 
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_post');
+        return $user->can('view_any_message');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Post $post): bool
+    public function view(User $user, Message $message): bool
     {
-        return $user->can('view_post');
+        return $user->can('view_message');
     }
 
     /**
@@ -38,31 +31,47 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_post');
+        return $user->can('create_message');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Post $post): bool
+    public function update(User $user, Message $message): bool
     {
-		if (!$this->isPostOwner($user, $post)) {
+		if ($message->is_deleted) {
 			return false;
 		}
 
-        return $user->can('update_post');
+		if ($message->is_hidden) {
+			return false;
+		}
+
+		if ($user->id !== $message->sender->id) {
+			return false;
+		}
+
+        return $user->can('update_message');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Post $post): bool
+    public function delete(User $user, Message $message): bool
     {
-		if (!$this->isPostOwner($user, $post)) {
+		if ($message->is_deleted) {
 			return false;
 		}
 
-        return $user->can('delete_post');
+		if ($message->is_hidden) {
+			return false;
+		}
+
+		if ($user->id !== $message->sender->id) {
+			return false;
+		}
+
+        return $user->can('delete_message');
     }
 
     /**
@@ -74,19 +83,27 @@ class PostPolicy
 			return false;
 		}
 
-        return $user->can('delete_any_post');
+        return $user->can('delete_any_message');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Post $post): bool
+    public function forceDelete(User $user, Message $message): bool
     {
-		if (!$this->isPostOwner($user, $post)) {
+		if ($message->is_deleted) {
 			return false;
 		}
 
-        return $user->can('force_delete_post');
+		if ($message->is_hidden) {
+			return false;
+		}
+
+		if ($user->id !== $message->sender->id) {
+			return false;
+		}
+
+        return $user->can('force_delete_message');
     }
 
     /**
@@ -98,15 +115,19 @@ class PostPolicy
 			return false;
 		}
 
-        return $user->can('force_delete_any_post');
+        return $user->can('force_delete_any_message');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Post $post): bool
+    public function restore(User $user, Message $message): bool
     {
-        return $user->can('restore_post');
+		if (!$user->isSuperAdmin()) {
+			return false;
+		}
+
+        return $user->can('restore_message');
     }
 
     /**
@@ -118,15 +139,15 @@ class PostPolicy
 			return false;
 		}
 
-        return $user->can('restore_any_post');
+        return $user->can('restore_any_message');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Post $post): bool
+    public function replicate(User $user, Message $message): bool
     {
-        return $user->can('replicate_post');
+        return $user->can('replicate_message');
     }
 
     /**
@@ -134,6 +155,6 @@ class PostPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_post');
+        return $user->can('reorder_message');
     }
 }

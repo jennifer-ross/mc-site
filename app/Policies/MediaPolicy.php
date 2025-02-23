@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Awcodes\Curator\Models\Media;
+use App\Models\Media;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MediaPolicy

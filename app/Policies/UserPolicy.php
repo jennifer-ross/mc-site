@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Support\Facades\Auth;
 
 class UserPolicy
 {
@@ -51,6 +52,10 @@ class UserPolicy
      */
     public function update(User $user): bool
     {
+        if(!Auth::user() || Auth::user()?->id !== $user->id) {
+            return false;
+        }
+
         return $user->can('update_user');
     }
 
@@ -62,6 +67,10 @@ class UserPolicy
      */
     public function delete(User $user): bool
     {
+        if (!$user->isSuperAdmin()) {
+            return false;
+        }
+
         return $user->can('delete_user');
     }
 
@@ -73,6 +82,10 @@ class UserPolicy
      */
     public function deleteAny(User $user): bool
     {
+        if (!$user->isSuperAdmin()) {
+            return false;
+        }
+
         return $user->can('delete_any_user');
     }
 
@@ -84,6 +97,10 @@ class UserPolicy
      */
     public function forceDelete(User $user): bool
     {
+        if (!$user->isSuperAdmin()) {
+            return false;
+        }
+
         return $user->can('force_delete_user');
     }
 
@@ -95,6 +112,10 @@ class UserPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
+        if (!$user->isSuperAdmin()) {
+            return false;
+        }
+
         return $user->can('force_delete_any_user');
     }
 
@@ -106,6 +127,10 @@ class UserPolicy
      */
     public function restore(User $user): bool
     {
+        if (!$user->isSuperAdmin()) {
+            return false;
+        }
+
         return $user->can('restore_user');
     }
 
@@ -117,6 +142,10 @@ class UserPolicy
      */
     public function restoreAny(User $user): bool
     {
+        if (!$user->isSuperAdmin()) {
+            return false;
+        }
+
         return $user->can('restore_any_user');
     }
 
