@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\UserProfileFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,7 +32,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|UserProfile whereMinecraftName($value)
  * @method static Builder<static>|UserProfile whereUpdatedAt($value)
  * @method static Builder<static>|UserProfile whereUserId($value)
- * @mixin \Eloquent
+ * @method static UserProfileFactory factory($count = null, $state = [])
+ * @mixin Eloquent
  */
 class UserProfile extends Model
 {
@@ -49,8 +52,6 @@ class UserProfile extends Model
 
 	/**
 	 * Get the user that owns the profile.
-	 *
-	 * @return BelongsTo
 	 */
 	public function user(): BelongsTo
 	{

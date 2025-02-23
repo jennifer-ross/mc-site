@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\MessageAttachmentFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,7 @@ use Nette\Utils\Image;
  * @method static Builder<static>|MessageAttachment whereImageId($value)
  * @method static Builder<static>|MessageAttachment whereUpdatedAt($value)
  * @method static Builder<static>|MessageAttachment whereUploadedBy($value)
+ * @method static MessageAttachmentFactory factory($count = null, $state = [])
  * @mixin \Eloquent
  */
 class MessageAttachment extends Model
@@ -40,13 +42,11 @@ class MessageAttachment extends Model
 	 */
 	protected $fillable = [
 		'image_id',
-		'uploaded_by'
+		'uploaded_by',
 	];
 
 	/**
 	 * Get the image that owns the attachment.
-	 *
-	 * @return BelongsTo
 	 */
 	public function image(): BelongsTo
 	{
@@ -55,8 +55,6 @@ class MessageAttachment extends Model
 
 	/**
 	 * Get the user that owns the attachment.
-	 *
-	 * @return BelongsTo
 	 */
 	public function uploaded(): BelongsTo
 	{

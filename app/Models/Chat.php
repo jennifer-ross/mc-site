@@ -3,20 +3,22 @@
 namespace App\Models;
 
 use App\Enums\ChatType;
+use App\Enums\ChatUserRole;
 use App\Enums\ChatVisibility;
 use App\Observers\ChatObserver;
+use Database\Factories\ChatFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 
 /**
- *
- *
  * @property int $id
  * @property string $type
  * @property string $visibility
@@ -31,6 +33,7 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $participants_count
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
+ *
  * @method static Builder<static>|Chat newModelQuery()
  * @method static Builder<static>|Chat newQuery()
  * @method static Builder<static>|Chat query()
@@ -41,7 +44,12 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Chat whereType($value)
  * @method static Builder<static>|Chat whereUpdatedAt($value)
  * @method static Builder<static>|Chat whereVisibility($value)
- * @mixin \Eloquent
+ *
+ * @property-read User|null $owner
+ *
+ * @method static ChatFactory factory($count = null, $state = [])
+ *
+ * @mixin Eloquent
  */
 #[ObservedBy([ChatObserver::class])]
 class Chat extends Model
@@ -60,36 +68,39 @@ class Chat extends Model
 		'owner_id',
 	];
 
-	/**
-	 *
-	 * @return HasManyThrough
-	 */
-	public function participants(): HasManyThrough
+	public function users(): BelongsToMany
 	{
-		return $this->hasManyThrough(ChatParticipant::class, User::class, 'user_id', 'chat_id', 'id', 'chat_id');
-//		return $this->hasMany(ChatParticipant::class);
-	}
-
-	/**
-	 *
-	 * @return HasManyThrough
-	 */
-	public function users(): HasManyThrough
-	{
-		return $this->hasManyThrough(User::class, ChatParticipant::class, 'chat_id', 'user_id', 'id', 'user_id');
-//		return $this->belongsToMany(Chat::class, 'chat_participants')->withPivot('role', 'joined_at');
+		return $this->belongsToMany(User::class, 'chat_participants')->withPivot('role', 'joined_at');
 	}
 
 	/**
 	 * Get the messages of the chat.
 	 *
 	 * This method returns all messages that belong to the chat.
-	 *
-	 * @return HasMany
 	 */
 	public function messages(): HasMany
 	{
 		return $this->hasMany(Message::class);
+	}
+
+	public function owner()
+	{
+		return $this->belongsTo(User::class, 'owner_id');
+	}
+
+	public function addUser(User|int $user, ChatUserRole $role)
+	{
+		return $this->participants()->create([
+			'chat_id' => $this->id,
+			'user_id' => is_int($user) ? $user : $user->id,
+			'role' => $role->value,
+		]);
+	}
+
+	public function participants(): HasManyThrough
+	{
+		return $this->hasManyThrough(ChatParticipant::class, User::class, 'user_id', 'chat_id', 'id', 'chat_id');
+		//		return $this->hasMany(ChatParticipant::class);
 	}
 
 	/**

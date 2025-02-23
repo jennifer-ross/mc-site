@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Events\UserCreated;
 use App\Observers\UserObserver;
 use Database\Factories\UserFactory;
+use Eloquent;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
@@ -69,12 +71,16 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @mixin \Eloquent
+ * @property-read Collection<int, Chat> $chatsOwner
+ * @property-read int|null $chats_owner_count
+ * @mixin Eloquent
  */
 #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable implements FilamentUser
 {
-	use HasApiTokens, HasFactory, Notifiable, HasRoles;
+	use HasApiTokens, HasFactory, HasRoles, Notifiable;
+
+	const AVATAR_API_URL = 'https://starlightskins.lunareclipse.studio/';
 
 	/**
 	 * The attributes that are mass assignable.
@@ -86,6 +92,7 @@ class User extends Authenticatable implements FilamentUser
 		'email',
 		'password',
 	];
+
 	/**
 	 * The attributes that should be hidden for serialization.
 	 *
@@ -95,6 +102,7 @@ class User extends Authenticatable implements FilamentUser
 		'password',
 		'remember_token',
 	];
+
 	/**
 	 * The event map for the model.
 	 *
@@ -109,13 +117,16 @@ class User extends Authenticatable implements FilamentUser
 	 */
 	public function canAccessPanel(Panel $panel): bool
 	{
+		return $this->isSuperAdmin();
+	}
+
+	public function isSuperAdmin()
+	{
 		return $this->hasRole('super_admin', 'web');
 	}
 
 	/**
 	 * The posts that belong to the user.
-	 *
-	 * @return HasMany
 	 */
 	public function posts(): HasMany
 	{
@@ -123,10 +134,24 @@ class User extends Authenticatable implements FilamentUser
 	}
 
 	/**
-	 * The chats that belong to the user.
-	 *
-	 * @return BelongsToMany
+	 * The chats that the user own.
 	 */
+	public function chatsOwner(): HasMany
+	{
+//        return $this->belongsToMany(Chat::class, 'chat_participants')->withPivot('role', 'joined_at');
+		return $this->hasMany(Chat::class, 'owner_id');
+	}
+
+	/**
+	 * The chats that belong to the user.
+	 */
+//	public function chats(): HasManyThrough
+//	{
+////        return $this->belongsToMany(Chat::class, 'chat_participants')->withPivot('role', 'joined_at');
+////		return $this->hasManyThrough(Chat::class, 'chat_participants');
+//		return $this->hasManyThrough(ChatParticipant::class, 'chat_id', 'user_id', 'id', 'id');
+//	}
+
 	public function chats(): BelongsToMany
 	{
 		return $this->belongsToMany(Chat::class, 'chat_participants')->withPivot('role', 'joined_at');
@@ -150,6 +175,25 @@ class User extends Authenticatable implements FilamentUser
 	public function block(): HasOne
 	{
 		return $this->hasOne(UserBlocks::class);
+	}
+
+	public function avatarUrl(): ?string
+	{
+		if ($this->hasVerification()) {
+			$minecraftName = $this->profile->minecraft_name;
+			return self::AVATAR_API_URL . "render/head/{$minecraftName}/full";
+		}
+
+		return null;
+	}
+
+	public function hasVerification(): bool
+	{
+		if ($this->profile && $this->profile->minecraft_name && $this->profile->minecraft_id) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

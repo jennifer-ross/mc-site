@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use App\Enums\MessageType;
+use Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  *
@@ -42,6 +45,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Message whereSenderId($value)
  * @method static Builder<static>|Message whereType($value)
  * @method static Builder<static>|Message whereUpdatedAt($value)
+ * @method static MessageFactory factory($count = null, $state = [])
  * @mixin \Eloquent
  */
 class Message extends Model
@@ -61,13 +65,11 @@ class Message extends Model
 		'attachment_id',
 		'is_deleted',
 		'is_edited',
-		'is_hidden'
+		'is_hidden',
 	];
 
 	/**
 	 * The chat that belong to the message.
-	 *
-	 * @return BelongsTo
 	 */
 	public function chat(): BelongsTo
 	{
@@ -76,22 +78,40 @@ class Message extends Model
 
 	/**
 	 * The user that belong to the message.
-	 *
-	 * @return BelongsTo
 	 */
 	public function sender(): BelongsTo
 	{
 		return $this->belongsTo(User::class, 'sender_id');
 	}
 
-	/**
-	 *
-	 *
-	 * @return HasOne
-	 */
 	public function messageAttachment(): HasOne
 	{
 		return $this->hasOne(MessageAttachment::class);
+	}
+
+	/**
+	 * Retrieve the post content blocks as an array.
+	 */
+	public function getBlocksAttribute(): array
+	{
+		return json_decode(
+			collect($this->content ?? [])->toJson()
+		);
+	}
+
+	/**
+	 * Retrieve the post excerpt.
+	 */
+	public function getExcerptAttribute(): string
+	{
+		$excerpt = collect($this->content)
+			->first() ?? [];
+
+		$excerpt = collect(
+			explode("\n", Arr::get($excerpt, 'data.content', ''))
+		)->first();
+
+		return Str::limit($excerpt, 21);
 	}
 
 	/**

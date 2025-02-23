@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Filament\Resources\PostResource;
 use Database\Factories\PostFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -48,7 +49,7 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Post whereTitle($value)
  * @method static Builder<static>|Post whereUpdatedAt($value)
  * @method static Builder<static>|Post whereUserId($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class Post extends Model
 {
@@ -84,8 +85,6 @@ class Post extends Model
 
 	/**
 	 * Get the user that owns the post.
-	 *
-	 * @return BelongsTo
 	 */
 	public function user(): BelongsTo
 	{
@@ -94,8 +93,6 @@ class Post extends Model
 
 	/**
 	 * Get the featured image for the post.
-	 *
-	 * @return BelongsTo
 	 */
 	public function image(): BelongsTo
 	{
@@ -104,8 +101,6 @@ class Post extends Model
 
 	/**
 	 * Retrieve the post URL.
-	 *
-	 * @return string
 	 */
 	public function getUrlAttribute(): string
 	{
@@ -114,8 +109,6 @@ class Post extends Model
 
 	/**
 	 * Retrieve the post edit URL.
-	 *
-	 * @return string
 	 */
 	public function getEditUrlAttribute(): string
 	{
@@ -124,8 +117,6 @@ class Post extends Model
 
 	/**
 	 * Retrieve the post content blocks as an object.
-	 *
-	 * @return object
 	 */
 	public function getBlocksAttribute(): object
 	{
@@ -136,8 +127,6 @@ class Post extends Model
 
 	/**
 	 * Retrieve the post excerpt.
-	 *
-	 * @return string
 	 */
 	public function getExcerptAttribute(): string
 	{
@@ -153,9 +142,6 @@ class Post extends Model
 
 	/**
 	 * Retrieve the published posts.
-	 *
-	 * @param Builder $query
-	 * @return Builder
 	 */
 	public function scopePublished(Builder $query): Builder
 	{
@@ -164,12 +150,31 @@ class Post extends Model
 
 	/**
 	 * Retrieve the draft posts.
-	 *
-	 * @param Builder $query
-	 * @return Builder
 	 */
 	public function scopeDrafts(Builder $query): Builder
 	{
 		return $query->where('is_published', false);
+	}
+
+	/**
+	 * Mark the post as published.
+	 */
+	public function publish(): bool
+	{
+		return $this->update([
+			'is_published' => true,
+			'published_at' => now(),
+		]);
+	}
+
+	/**
+	 * Mark the post as unpublished.
+	 */
+	public function unpublish(): bool
+	{
+		return $this->update([
+			'is_published' => false,
+			'published_at' => null,
+		]);
 	}
 }

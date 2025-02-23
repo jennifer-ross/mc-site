@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\UserBlocksFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +35,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|UserBlocks whereToDate($value)
  * @method static Builder<static>|UserBlocks whereUpdatedAt($value)
  * @method static Builder<static>|UserBlocks whereUserId($value)
- * @mixin \Eloquent
+ * @method static UserBlocksFactory factory($count = null, $state = [])
+ * @mixin Eloquent
  */
 class UserBlocks extends Model
 {
@@ -54,8 +57,6 @@ class UserBlocks extends Model
 
 	/**
 	 * Get the user that owns the block.
-	 *
-	 * @return BelongsTo
 	 */
 	public function user(): BelongsTo
 	{
@@ -64,8 +65,6 @@ class UserBlocks extends Model
 
 	/**
 	 * Get the user that owns the block. Who block user
-	 *
-	 * @return BelongsTo
 	 */
 	public function blockedBy(): BelongsTo
 	{

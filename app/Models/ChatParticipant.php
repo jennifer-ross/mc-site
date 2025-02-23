@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ChatUserRole;
+use Database\Factories\ChatParticipantFactory;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +31,10 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ChatParticipant whereRole($value)
  * @method static Builder<static>|ChatParticipant whereUpdatedAt($value)
  * @method static Builder<static>|ChatParticipant whereUserId($value)
- * @mixin \Eloquent
+ * @method static ChatParticipantFactory factory($count = null, $state = [])
+ * @property-read Chat $chat
+ * @property-read User $user
+ * @mixin Eloquent
  */
 class ChatParticipant extends Model
 {
@@ -47,6 +52,16 @@ class ChatParticipant extends Model
 		'joined_at',
 	];
 
+	public function user()
+	{
+		return $this->belongsTo(User::class, 'user_id');
+	}
+
+	public function chat()
+	{
+		return $this->belongsTo(Chat::class, 'chat_id');
+	}
+
 	/**
 	 * Get the attributes that should be cast.
 	 *
@@ -61,5 +76,4 @@ class ChatParticipant extends Model
 			'role' => ChatUserRole::class,
 		];
 	}
-
 }
