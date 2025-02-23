@@ -46,8 +46,8 @@ class AdminPanelProvider extends PanelProvider
                 ResourceLockPlugin::make(),
 
                 FilamentSpatieLaravelBackupPlugin::make()
-					 ->timeout(360)
-					->usingQueue('backup-queue'),
+                    ->timeout(360)
+                    ->usingQueue('backup-queue'),
 
                 CuratorPlugin::make()
                     ->label('Media')
@@ -72,6 +72,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('components.logo'))
             ->navigationGroups([
                 'Collections',
+                'Chat',
+                'User',
                 'Media',
                 'Settings',
             ])
