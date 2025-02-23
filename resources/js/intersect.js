@@ -21,11 +21,11 @@ const Observer = {
 		]
 
 		document.querySelectorAll(selectors.join(',')).forEach(element => {
-			let lastTime = 0
+			let lastTime = -100
 
 			const observer = new IntersectionObserver(entries => {
 				entries.forEach(entry => {
-					if (lastTime + 200 >= entry.time) {
+					if (lastTime + 100 >= entry.time) {
 						return
 					}
 
