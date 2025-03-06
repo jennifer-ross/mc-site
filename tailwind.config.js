@@ -55,6 +55,8 @@ module.exports = {
 			},
 			boxShadow: {
 				'3lg': '0px 25px 35px 0 rgb(0 0 0 / 0.03), 0px 0px 5px 0 rgb(0 0 0 / 0.05)',
+				'3nlg': '0px 25px 35px 0 rgb(0 0 0 / 0.03)',
+				'4lg': '0px 30px 60px 0 rgb(0.14901961386203766 0.20000000298023224 0.3019607961177826 / 0.03)'
 			},
 			fontFamily: {
 				'poppins': ['Poppins', 'sans-serif'],
