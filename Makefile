@@ -26,4 +26,6 @@ cc:
 	php artisan config:clear
 	php artisan route:clear
 	php artisan view:clear
+	php artisan filament:clear-cached-components
+	php artisan filament:optimize-clear
 	composer dump-autoload
