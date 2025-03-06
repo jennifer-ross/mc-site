@@ -27,11 +27,15 @@
 		"laravel/tinker": "^2.9",
 		"livewire/livewire": "^3.3",
 		"mallardduck/blade-boxicons": "^2.4",
+		"mallardduck/blade-lucide-icons": "^1.23",
 		"pboivin/filament-peek": "^2.2",
+		"php-amqplib/php-amqplib": "^3.7",
+		"predis/predis": "^2.0",
 		"romanzipp/laravel-seo": "^2.6",
 		"shuvroroy/filament-spatie-laravel-backup": "^2.2",
 		"sinnbeck/markdom": "^2.0",
 		"socialiteproviders/discord": "^4.2",
+		"vladimir-yuldashev/laravel-queue-rabbitmq": "^14.1",
 		"z3d0x/filament-logger": "^0.7.0"
 	},
 	"require-dev": {

@@ -26,6 +26,8 @@
 		"@tailwindcss/postcss": "^4.0.5",
 		"alpine-magic-helpers": "^1.2.2",
 		"css-skeletons": "^1.0.7",
+		"quill": "^2.0.3",
+		"quill-mention": "^6.0.2",
 		"tippy.js": "^6.3.7"
 	}
 }
