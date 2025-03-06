@@ -8,3 +8,7 @@ data
 .prettierrc
 LICENSE.md
 README.md
+hs_err_*
+_ide_helper_models.php
+_ide_helper.php
+.phpstorm.meta.php
