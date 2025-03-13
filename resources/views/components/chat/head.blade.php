@@ -4,7 +4,7 @@
 
 @php
 	$time = new \Illuminate\Support\Carbon($chat->owner->last_interaction);
-	$online = (new \Illuminate\Support\Carbon($time->unix()))->addMinutes(5) >= (new \Illuminate\Support\Carbon($time->unix()))->addMinutes(5);
+	$online = (new \Illuminate\Support\Carbon($time->unix()))->addMinutes(5) >= now();
 @endphp
 
 <div class="flex p-4 w-full text-white">
