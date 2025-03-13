@@ -15,6 +15,10 @@ class MessageAttachmentPolicy
      */
     public function viewAny(User $user): bool
     {
+		if (!$user->hasVerification()) {
+			return false;
+		}
+
         return $user->can('view_any_message::attachment');
     }
 
