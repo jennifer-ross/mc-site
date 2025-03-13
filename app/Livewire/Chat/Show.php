@@ -4,29 +4,46 @@ namespace App\Livewire\Chat;
 
 use App\Concerns\HasPreview;
 use App\Models\Chat;
+use App\Services\ChatService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use Livewire\Component;
+use Spatie\SchemaOrg\Schema;
 
 class Show extends Component
 {
-    use HasPreview;
-
     /**
-     * The post instance.
+     * The chat id
      *
-     * @var Chat
+     * @var int
      */
-    public $chat;
+	public $chatId;
+	/**
+	 * The chat instance.
+	 *
+	 * @var Chat
+	 */
+	public $currentChat;
+	/**
+	 * Chats and last message
+	 *
+	 * @var array
+	 */
+	public $chats;
 
 	/**
 	 * Mount the component.
 	 *
-	 * @param Chat $chat
+	 * @param ChatService $chatService
+	 * @param int $chatId
 	 * @return void
 	 */
-    public function mount(Chat $chat): void
+    public function mount(ChatService $chatService, int $chatId): void
 	{
-        $this->chat = Chat::whereId($chat)->firstOrFail();
+        $this->currentChat = Cache::rememberForever("chats:{$chatId}", function () use ($chatId) {
+			return Chat::whereId($chatId)->firstOrFail();
+		});
+		$this->chats = $chatService->getChats();
     }
 
     /**
@@ -36,6 +53,21 @@ class Show extends Component
      */
     public function render(): View
 	{
-        return view('livewire.chat.show');
+		seo()
+			->title($title = config('app.name'))
+			->description($description = 'Lorem ipsum...')
+			->canonical($url = route('home'))
+			->addSchema(
+				Schema::webPage()
+					->name($title)
+					->description($description)
+					->url($url)
+					->author(Schema::organization()->name($title))
+			);
+
+        return view('livewire.chat.show', [
+			'chats' => $this->chats,
+			'currentChat' => $this->currentChat,
+		]);
     }
 }

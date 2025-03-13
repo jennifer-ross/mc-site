@@ -12,6 +12,9 @@
 			<x-modals.auth/>
 		@endpush
 	@else
+		@push('scripts')
+			@vite('resources/js/modules/echo.js')
+		@endpush
 		<div class="flex flex-1 w-full">
 			<div>
 

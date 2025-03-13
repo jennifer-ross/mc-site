@@ -16,7 +16,7 @@ Route::get('auth/discord/callback', [DiscordOAuthController::class, 'store'])->n
 
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('/chats', Chats::class)->name('chats');
-	Route::get('/chat/{chat:id}', ChatShow::class)->name('chat.show');
+	Route::get('/chat/{chatId}', ChatShow::class)->name('chat.show');
 
 	Route::get('/logout', [UserController::class, 'logout'])->name('user.logout');
 });

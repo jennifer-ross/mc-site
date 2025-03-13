@@ -2,21 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserBlocksResource\Pages;
+use App\Filament\Resources\UserBlockResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers\UserProfilesRelationManager;
-use App\Models\UserBlocks;
+use App\Models\UserBlock;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class UserBlocksResource extends Resource
+class UserBlockResource extends Resource
 {
-    protected static ?string $model = UserBlocks::class;
+    protected static ?string $model = UserBlock::class;
 
     /**
      * The resource navigation icon.
@@ -93,9 +92,9 @@ class UserBlocksResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUserBlocks::route('/'),
-            'create' => Pages\CreateUserBlocks::route('/create'),
-            'edit' => Pages\EditUserBlocks::route('/{record}/edit'),
+            'index' => Pages\ListUserBlock::route('/'),
+            'create' => Pages\CreateUserBlock::route('/create'),
+            'edit' => Pages\EditUserBlock::route('/{record}/edit'),
         ];
     }
 }

@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Concerns\Cacheable;
 use App\Filament\Resources\PostResource;
+use App\Observers\PostObserver;
 use Database\Factories\PostFactory;
 use Eloquent;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,8 +17,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- *
- *
  * @property int $id
  * @property string $title
  * @property string $slug
@@ -33,6 +34,7 @@ use Illuminate\Support\Str;
  * @property-read \App\Models\TFactory|null $use_factory
  * @property-read Media|null $image
  * @property-read User $user
+ *
  * @method static Builder<static>|Post drafts()
  * @method static PostFactory factory($count = null, $state = [])
  * @method static Builder<static>|Post newModelQuery()
@@ -49,132 +51,144 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Post whereTitle($value)
  * @method static Builder<static>|Post whereUpdatedAt($value)
  * @method static Builder<static>|Post whereUserId($value)
+ *
  * @mixin Eloquent
  */
+#[ObservedBy([PostObserver::class])]
 class Post extends Model
 {
-	use HasFactory;
+    use Cacheable, HasFactory;
 
-	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array
-	 */
-	protected $fillable = [
-		'title',
-		'slug',
-		'content',
-		'image_id',
-		'user_id',
-		'is_published',
-		'published_at',
-	];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'title',
+        'slug',
+        'content',
+        'image_id',
+        'user_id',
+        'is_published',
+        'published_at',
+    ];
 
-	/**
-	 * The attributes that should be cast.
-	 *
-	 * @var array
-	 */
-	protected $casts = [
-		'content' => 'array',
-		'created_at' => 'datetime',
-		'updated_at' => 'datetime',
-		'is_published' => 'boolean',
-		'published_at' => 'datetime',
-	];
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'content' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'is_published' => 'boolean',
+        'published_at' => 'datetime',
+    ];
 
-	/**
-	 * Get the user that owns the post.
-	 */
-	public function user(): BelongsTo
-	{
-		return $this->belongsTo(User::class);
-	}
+    /**
+     * Get the user that owns the post.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
-	/**
-	 * Get the featured image for the post.
-	 */
-	public function image(): BelongsTo
-	{
-		return $this->belongsTo(Media::class);
-	}
+    public function getUser(): ?User
+    {
+        return User::getFromCacheById($this->user_id);
+    }
 
-	/**
-	 * Retrieve the post URL.
-	 */
-	public function getUrlAttribute(): string
-	{
-		return route('post.show', $this);
-	}
+    /**
+     * Get the featured image for the post.
+     */
+    public function image(): BelongsTo
+    {
+        return $this->belongsTo(Media::class);
+    }
 
-	/**
-	 * Retrieve the post edit URL.
-	 */
-	public function getEditUrlAttribute(): string
-	{
-		return PostResource::getUrl('edit', ['record' => $this]);
-	}
+    public function getImage(): ?Media
+    {
+        return Media::getFromCacheById($this->image_id);
+    }
 
-	/**
-	 * Retrieve the post content blocks as an object.
-	 */
-	public function getBlocksAttribute(): object
-	{
-		return json_decode(
-			collect($this->content ?? [])->toJson()
-		);
-	}
+    /**
+     * Retrieve the post URL.
+     */
+    public function getUrlAttribute(): string
+    {
+        return route('post.show', $this);
+    }
 
-	/**
-	 * Retrieve the post excerpt.
-	 */
-	public function getExcerptAttribute(): string
-	{
-		$excerpt = collect($this->content)
-			->firstWhere('type', 'markdown') ?? [];
+    /**
+     * Retrieve the post edit URL.
+     */
+    public function getEditUrlAttribute(): string
+    {
+        return PostResource::getUrl('edit', ['record' => $this]);
+    }
 
-		$excerpt = collect(
-			explode("\n", Arr::get($excerpt, 'data.content', ''))
-		)->first();
+    /**
+     * Retrieve the post content blocks as an object.
+     */
+    public function getBlocksAttribute(): object
+    {
+        return json_decode(
+            collect($this->content ?? [])->toJson()
+        );
+    }
 
-		return Str::limit($excerpt, 160);
-	}
+    /**
+     * Retrieve the post excerpt.
+     */
+    public function getExcerptAttribute(): string
+    {
+        $excerpt = collect($this->content)
+            ->firstWhere('type', 'markdown') ?? [];
 
-	/**
-	 * Retrieve the published posts.
-	 */
-	public function scopePublished(Builder $query): Builder
-	{
-		return $query->where('is_published', true);
-	}
+        $excerpt = collect(
+            explode("\n", Arr::get($excerpt, 'data.content', ''))
+        )->first();
 
-	/**
-	 * Retrieve the draft posts.
-	 */
-	public function scopeDrafts(Builder $query): Builder
-	{
-		return $query->where('is_published', false);
-	}
+        return Str::limit($excerpt, 160);
+    }
 
-	/**
-	 * Mark the post as published.
-	 */
-	public function publish(): bool
-	{
-		return $this->update([
-			'is_published' => true,
-			'published_at' => now(),
-		]);
-	}
+    /**
+     * Retrieve the published posts.
+     */
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('is_published', true);
+    }
 
-	/**
-	 * Mark the post as unpublished.
-	 */
-	public function unpublish(): bool
-	{
-		return $this->update([
-			'is_published' => false,
-			'published_at' => null,
-		]);
-	}
+    /**
+     * Retrieve the draft posts.
+     */
+    public function scopeDrafts(Builder $query): Builder
+    {
+        return $query->where('is_published', false);
+    }
+
+    /**
+     * Mark the post as published.
+     */
+    public function publish(): bool
+    {
+        return $this->update([
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+    }
+
+    /**
+     * Mark the post as unpublished.
+     */
+    public function unpublish(): bool
+    {
+        return $this->update([
+            'is_published' => false,
+            'published_at' => null,
+        ]);
+    }
 }

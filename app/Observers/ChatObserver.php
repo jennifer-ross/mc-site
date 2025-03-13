@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Enums\ChatType;
 use App\Enums\ChatUserRole;
 use App\Models\Chat;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class ChatObserver
 {
@@ -14,6 +15,8 @@ class ChatObserver
 	public function created(Chat $chat): void
 	{
 		$chat->addUser($chat->owner_id, $chat->type !== ChatType::Private ? ChatUserRole::Admin : ChatUserRole::Member);
+		$chat->getLastMessage();
+		$chat->cache();
 	}
 
 	/**
@@ -21,15 +24,16 @@ class ChatObserver
 	 */
 	public function updated(Chat $chat): void
 	{
-		//
+		$chat->cache();
 	}
 
 	/**
 	 * Handle the Chat "deleted" event.
+	 * @throws InvalidArgumentException
 	 */
 	public function deleted(Chat $chat): void
 	{
-		//
+		$chat->removeCache();
 	}
 
 	/**
@@ -37,14 +41,15 @@ class ChatObserver
 	 */
 	public function restored(Chat $chat): void
 	{
-		//
+		$chat->cache();
 	}
 
 	/**
 	 * Handle the Chat "force deleted" event.
+	 * @throws InvalidArgumentException
 	 */
 	public function forceDeleted(Chat $chat): void
 	{
-		//
+		$chat->removeCache();
 	}
 }

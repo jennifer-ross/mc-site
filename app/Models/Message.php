@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Concerns\Cacheable;
 use App\Enums\MessageType;
+use App\Observers\MessageObserver;
 use Database\Factories\MessageFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,8 +17,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- *
- *
  * @property int $id
  * @property int $chat_id
  * @property int $sender_id
@@ -31,6 +32,7 @@ use Illuminate\Support\Str;
  * @property-read \App\Models\TFactory|null $use_factory
  * @property-read MessageAttachment|null $messageAttachment
  * @property-read User $sender
+ *
  * @method static Builder<static>|Message newModelQuery()
  * @method static Builder<static>|Message newQuery()
  * @method static Builder<static>|Message query()
@@ -46,89 +48,157 @@ use Illuminate\Support\Str;
  * @method static Builder<static>|Message whereType($value)
  * @method static Builder<static>|Message whereUpdatedAt($value)
  * @method static MessageFactory factory($count = null, $state = [])
+ *
+ * @property-read array $blocks
+ * @property-read string $excerpt
+ *
  * @mixin \Eloquent
  */
+#[ObservedBy([MessageObserver::class])]
 class Message extends Model
 {
-	use HasFactory;
+    use Cacheable, HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'chat_id',
+        'sender_id',
+        'type',
+        'content',
+        'attachment_id',
+        'is_deleted',
+        'is_edited',
+        'is_hidden',
+    ];
+
+    /**
+     * The chat that belong to the message.
+     */
+    public function chat(): BelongsTo
+    {
+        return $this->belongsTo(Chat::class);
+    }
+
+    /**
+     * The user that belong to the message.
+     */
+    public function sender(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    public function messageAttachment(): HasOne
+    {
+        return $this->hasOne(MessageAttachment::class);
+    }
+
+    /**
+     * Retrieve the message content blocks as an array.
+     */
+    public function getBlocksAttribute(): array
+    {
+        return json_decode(
+            collect($this->content ?? [])->toJson()
+        );
+    }
+
+    /**
+     * Retrieve the message excerpt.
+     */
+    public function getExcerptAttribute(): string
+    {
+        $excerpt = collect($this->content)
+            ->first() ?? [];
+
+        $excerpt = collect(
+            explode("\n", Arr::get($excerpt, 'data.content', ''))
+        )->first();
+
+        return Str::limit($excerpt, 21);
+    }
 
 	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
+	 * Retrieve the message content.
 	 */
-	protected $fillable = [
-		'chat_id',
-		'sender_id',
-		'type',
-		'content',
-		'attachment_id',
-		'is_deleted',
-		'is_edited',
-		'is_hidden',
-	];
-
-	/**
-	 * The chat that belong to the message.
-	 */
-	public function chat(): BelongsTo
-	{
-		return $this->belongsTo(Chat::class);
-	}
-
-	/**
-	 * The user that belong to the message.
-	 */
-	public function sender(): BelongsTo
-	{
-		return $this->belongsTo(User::class, 'sender_id');
-	}
-
-	public function messageAttachment(): HasOne
-	{
-		return $this->hasOne(MessageAttachment::class);
-	}
-
-	/**
-	 * Retrieve the post content blocks as an array.
-	 */
-	public function getBlocksAttribute(): array
-	{
-		return json_decode(
-			collect($this->content ?? [])->toJson()
-		);
-	}
-
-	/**
-	 * Retrieve the post excerpt.
-	 */
-	public function getExcerptAttribute(): string
+	public function getTextAttribute(): string
 	{
 		$excerpt = collect($this->content)
 			->first() ?? [];
 
-		$excerpt = collect(
+		return collect(
 			explode("\n", Arr::get($excerpt, 'data.content', ''))
 		)->first();
-
-		return Str::limit($excerpt, 21);
 	}
 
 	/**
-	 * Get the attributes that should be cast.
+	 * Get the Sender attribute.
 	 *
-	 * @return array<string, string>
+	 * @return User|null
 	 */
-	protected function casts(): array
+	public function getSenderAttribute(): ?User
 	{
-		return [
-			'created_at' => 'datetime',
-			'updated_at' => 'datetime',
-			'is_deleted' => 'boolean',
-			'is_edited' => 'boolean',
-			'is_hidden' => 'boolean',
-			'content' => 'json',
-			'type' => MessageType::class,
-		];
+		return $this->getSender();
 	}
+
+	/**
+	 * Get the Chat attribute.
+	 *
+	 * @return Chat|null
+	 */
+	public function getChatAttribute(): ?Chat
+	{
+		return $this->getChat();
+	}
+
+	/**
+	 * Get the MessageAttachment attribute.
+	 *
+	 * @return Chat|null
+	 */
+	public function getMessageAttachmentAttribute(): ?MessageAttachment
+	{
+		return $this->getMessageAttachment();
+	}
+
+
+	public function getMessageAttachment(): ?MessageAttachment
+    {
+        if (! $this->attachment_id) {
+            return null;
+        }
+
+        return MessageAttachment::getFromCacheById($this->attachment_id);
+    }
+
+    public function getSender(): ?User
+    {
+        return User::getFromCacheById($this->sender_id);
+    }
+
+    public function getChat(): ?Chat
+    {
+        return Chat::getFromCacheById($this->chat_id);
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'is_deleted' => 'boolean',
+            'is_edited' => 'boolean',
+            'is_hidden' => 'boolean',
+            'content' => 'json',
+            'type' => MessageType::class,
+        ];
+    }
 }

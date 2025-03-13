@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\Cacheable;
 use App\Enums\ChatType;
 use App\Enums\ChatUserRole;
 use App\Enums\ChatVisibility;
@@ -13,10 +14,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * @property int $id
@@ -54,67 +58,184 @@ use Illuminate\Support\Carbon;
 #[ObservedBy([ChatObserver::class])]
 class Chat extends Model
 {
-	use HasFactory;
+    use Cacheable, HasFactory;
 
-	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array<int, string>
-	 */
-	protected $fillable = [
-		'type',
-		'visibility',
-		'name',
-		'owner_id',
-	];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'type',
+        'visibility',
+        'name',
+        'owner_id',
+    ];
 
-	public function users(): BelongsToMany
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'chat_participants')->withPivot('role', 'joined_at');
+    }
+
+    /**
+     * Get the messages of the chat.
+     *
+     * This method returns all messages that belong to the chat.
+     */
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    /**
+     * Get the messages attribute.
+     *
+     * @return Collection<Message>
+     */
+    public function getMessagesAttribute(): Collection
+    {
+        return $this->getMessages();
+    }
+
+    public function getMessages(): Collection
+    {
+        $messagesCacheKey = $this->getCacheKey().':messages';
+
+        return Cache::rememberForever($messagesCacheKey, function () {
+            return Message::where(['chat_id' => $this->id, 'is_hidden' => false, 'is_deleted' => false])->get();
+        });
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    /**
+     * Get the owner attribute.
+     */
+    public function getOwnerAttribute(): ?User
+    {
+        return $this->getOwner();
+    }
+
+    public function getOwner(): ?User
+    {
+        return User::getFromCacheById($this->owner_id);
+    }
+
+    public function addUser(User|int $user, ChatUserRole $role)
+    {
+        return $this->participants()->create([
+            'chat_id' => $this->id,
+            'user_id' => is_int($user) ? $user : $user->id,
+            'role' => $role->value,
+        ]);
+    }
+
+    public function participants(): HasManyThrough
+    {
+        return $this->hasManyThrough(ChatParticipant::class, User::class, 'user_id', 'chat_id', 'id', 'chat_id');
+        //		return $this->hasMany(ChatParticipant::class);
+    }
+
+    /**
+     * Get the last message attribute.
+     */
+    public function getLastMessageAttribute(): ?Message
+    {
+        return $this->getLastMessage();
+    }
+
+    public function getLastMessage(): ?Message
+    {
+        $lastMessageCacheKey = $this->getCacheKey().':last_message';
+
+        return Cache::rememberForever($lastMessageCacheKey, function () {
+            return Message::where([
+                'chat_id' => $this->id,
+                'is_hidden' => false,
+                'is_deleted' => false,
+            ])->latest()->get()->first();
+        });
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function setLastMessage(?Message $message = null): bool
+    {
+        $lastMessageCacheKey = $this->getCacheKey().':last_message';
+
+        if (! $message && Cache::has($lastMessageCacheKey)) {
+            return Cache::delete($lastMessageCacheKey);
+        }
+
+        return Cache::put($lastMessageCacheKey, $message);
+    }
+
+	public function getIsPrivateChatAttribute(): bool
 	{
-		return $this->belongsToMany(User::class, 'chat_participants')->withPivot('role', 'joined_at');
+		return $this->isPrivateChat();
 	}
 
-	/**
-	 * Get the messages of the chat.
-	 *
-	 * This method returns all messages that belong to the chat.
-	 */
-	public function messages(): HasMany
+	public function isPrivateChat(): bool
 	{
-		return $this->hasMany(Message::class);
+		return $this->visibility === ChatVisibility::Private;
 	}
 
-	public function owner()
+	public function getIsPublicChatAttribute(): bool
 	{
-		return $this->belongsTo(User::class, 'owner_id');
+		return $this->isPublicChat();
 	}
 
-	public function addUser(User|int $user, ChatUserRole $role)
+	public function isPublicChat(): bool
 	{
-		return $this->participants()->create([
-			'chat_id' => $this->id,
-			'user_id' => is_int($user) ? $user : $user->id,
-			'role' => $role->value,
-		]);
+		return $this->visibility === ChatVisibility::Public;
 	}
 
-	public function participants(): HasManyThrough
+	public function getIsPrivateAttribute(): bool
 	{
-		return $this->hasManyThrough(ChatParticipant::class, User::class, 'user_id', 'chat_id', 'id', 'chat_id');
-		//		return $this->hasMany(ChatParticipant::class);
+		return $this->isPrivate();
 	}
 
-	/**
-	 * Get the attributes that should be cast.
-	 *
-	 * @return array<string, string>
-	 */
-	protected function casts(): array
+	public function isPrivate(): bool
 	{
-		return [
-			'created_at' => 'datetime',
-			'updated_at' => 'datetime',
-			'type' => ChatType::class,
-			'visibility' => ChatVisibility::class,
-		];
+		return $this->type === ChatType::Private;
 	}
+
+	public function getIsGroupAttribute(): bool
+	{
+		return $this->isGroup();
+	}
+
+	public function isGroup(): bool
+	{
+		return $this->type === ChatType::Group;
+	}
+
+	public function getIsCourtAttribute(): bool
+	{
+		return $this->isCourt();
+	}
+
+	public function isCourt(): bool
+	{
+		return $this->type === ChatType::Court;
+	}
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'type' => ChatType::class,
+            'visibility' => ChatVisibility::class,
+        ];
+    }
 }

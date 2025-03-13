@@ -25,7 +25,7 @@ class Show extends Component
      * @param Post $post
      * @return void
      */
-    public function mount($post)
+    public function mount(Post $post)
     {
         $this->post = Post::whereSlug($post)->firstOrFail();
 

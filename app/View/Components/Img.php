@@ -5,6 +5,7 @@ namespace App\View\Components;
 use App\Models\Media;
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
 use League\Glide\Urls\UrlBuilderFactory;
@@ -61,7 +62,8 @@ class Img extends Component
         if (! $media instanceof Media) {
             if (! is_null($media)) {
                 $media = (int) $media;
-                $this->media = app(Media::class)::where('id', $media)->first();
+
+                $this->media = Media::getFromCacheById($media);
             }
 
             if (! $this->media && $this->fallback) {

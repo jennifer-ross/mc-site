@@ -27,10 +27,11 @@
 })
 
 @php($color = match ($color) {
-  'primary' => 'bg-primary-100 hover:bg-primary-600 text-white',
+  'primary' => 'bg-primary-100 hover:bg-primary-400 text-white',
   'green' => 'bg-green-500 hover:bg-green-600 text-white',
   'gray' => 'bg-gray-500 hover:bg-gray-600 text-white',
-  default => 'bg-primary-500 hover:bg-primary-600 text-white',
+  'none' => '',
+  default => 'bg-primary-100 hover:bg-primary-400 text-white',
 })
 
 @php($tag = $url ? 'a' : $tag)
