@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Concerns\Cacheable;
+use App\Observers\MediaObserver;
 use Awcodes\Curator\Models\Media as CuratorMedia;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Storage;
 
+#[ObservedBy([MediaObserver::class])]
 class Media extends CuratorMedia
 {
+    use Cacheable;
+
     protected function url(): Attribute
     {
         return Attribute::make(

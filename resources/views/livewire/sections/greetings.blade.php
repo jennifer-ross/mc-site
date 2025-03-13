@@ -1,4 +1,4 @@
-<div class="w-full mt-60 mb-20 transition-opacity intersect:motion-opacity-in-0 motion-delay-200">
+<div class="w-full mt-60 mb-28 transition-opacity intersect:motion-opacity-in-0 motion-delay-200">
 	<div class="grid grid-rows-1 place-items-center justify-center grid-flow-col auto-cols-max gap-4 mb-6 max-w-xs text-center text-gray-400 mx-auto">
 		<x-ui.tag>{{ __('greetings.tags.minecraft') }}</x-ui.tag>
 		<x-ui.tags-divider/>

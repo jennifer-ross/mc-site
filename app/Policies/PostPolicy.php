@@ -10,11 +10,22 @@ class PostPolicy
 {
     use HandlesAuthorization;
 
+	private function isPostOwner(User $user, Post $post)
+	{
+		if ($user->id !== $post->user->id) {
+			return false;
+		}
+	}
+
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
+		if (!$user->hasVerification()) {
+			return false;
+		}
+
         return $user->can('view_any_post');
     }
 
@@ -39,6 +50,10 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
+		if (!$this->isPostOwner($user, $post)) {
+			return false;
+		}
+
         return $user->can('update_post');
     }
 
@@ -47,6 +62,10 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
+		if (!$this->isPostOwner($user, $post)) {
+			return false;
+		}
+
         return $user->can('delete_post');
     }
 
@@ -55,6 +74,10 @@ class PostPolicy
      */
     public function deleteAny(User $user): bool
     {
+		if (!$user->isSuperAdmin()) {
+			return false;
+		}
+
         return $user->can('delete_any_post');
     }
 
@@ -63,6 +86,10 @@ class PostPolicy
      */
     public function forceDelete(User $user, Post $post): bool
     {
+		if (!$this->isPostOwner($user, $post)) {
+			return false;
+		}
+
         return $user->can('force_delete_post');
     }
 
@@ -71,6 +98,10 @@ class PostPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
+		if (!$user->isSuperAdmin()) {
+			return false;
+		}
+
         return $user->can('force_delete_any_post');
     }
 
@@ -87,6 +118,10 @@ class PostPolicy
      */
     public function restoreAny(User $user): bool
     {
+		if (!$user->isSuperAdmin()) {
+			return false;
+		}
+
         return $user->can('restore_any_post');
     }
 

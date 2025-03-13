@@ -9,6 +9,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         App\Providers\AppServiceProvider::class,
         App\Providers\AdminPanelProvider::class,
+		Illuminate\Broadcasting\BroadcastServiceProvider::class,
+		Laravel\Reverb\ReverbServiceProvider::class,
+		Illuminate\Events\EventServiceProvider::class,
     ])
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -20,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web([
             App\Http\Middleware\AddSeoDefaults::class,
+			App\Http\Middleware\UpdateSessionActivity::class
         ]);
 
         $middleware->redirectTo(fn () => Filament\Pages\Dashboard::getUrl());

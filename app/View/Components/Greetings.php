@@ -3,8 +3,8 @@
 namespace App\View\Components;
 
 use Closure;
-use Illuminate\View\Component;
 use Illuminate\Contracts\View\View;
+use Illuminate\View\Component;
 
 class Greetings extends Component
 {
@@ -21,16 +21,16 @@ class Greetings extends Component
      */
     public function render(): View|Closure|string
     {
-		$isMinecraftServerOnline = true;
-		$currentPlayers = 30;
-		$availablePlayers = 40;
-		$percentagePlayersOnline = ceil($currentPlayers / $availablePlayers * 100);
+        $isMinecraftServerOnline = true;
+        $currentPlayers = 30;
+        $availablePlayers = 40;
+        $percentagePlayersOnline = ceil($currentPlayers / $availablePlayers * 100);
 
         return view('livewire.sections.greetings', [
-			'isOnline' => $isMinecraftServerOnline,
-			'currentPlayers' => $currentPlayers,
-			'availablePlayers' => $availablePlayers,
-			'percentagePlayers' => $percentagePlayersOnline,
-		]);
+            'isOnline' => $isMinecraftServerOnline,
+            'currentPlayers' => $currentPlayers,
+            'availablePlayers' => $availablePlayers,
+            'percentagePlayers' => $percentagePlayersOnline,
+        ]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire\Post;
 
 use App\Concerns\HasPreview;
 use App\Models\Post;
+use Illuminate\View\View;
 use Livewire\Component;
 use Spatie\SchemaOrg\Schema;
 
@@ -14,17 +15,17 @@ class Show extends Component
     /**
      * The post instance.
      *
-     * @var \App\Models\Post
+     * @var Post
      */
     public $post;
 
     /**
      * Mount the component.
      *
-     * @param  \App\Models\Post  $post
+     * @param Post $post
      * @return void
      */
-    public function mount($post)
+    public function mount(Post $post)
     {
         $this->post = Post::whereSlug($post)->firstOrFail();
 
@@ -36,10 +37,10 @@ class Show extends Component
     /**
      * Render the component.
      *
-     * @return \Illuminate\View\View
+     * @return View
      */
-    public function render()
-    {
+    public function render(): View
+	{
         seo()
             ->title($this->post->title)
             ->description($this->post->excerpt)

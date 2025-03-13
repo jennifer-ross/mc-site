@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Awcodes\Curator\Models\Media;
+use App\Models\Media;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MediaPolicy
@@ -15,6 +15,10 @@ class MediaPolicy
      */
     public function viewAny(User $user): bool
     {
+		if (!$user->hasVerification()) {
+			return false;
+		}
+
         return $user->can('view_any_media');
     }
 
