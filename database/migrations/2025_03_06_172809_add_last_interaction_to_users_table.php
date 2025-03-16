@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-			$table->integer('last_interaction')->index();
+			$table->integer('last_interaction')->default(0)->index();
         });
     }
 
