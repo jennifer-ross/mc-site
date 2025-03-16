@@ -219,7 +219,7 @@ class User extends Authenticatable implements FilamentUser
 
 		/* @var Session $session */
 		foreach ($this->getSessions() as $session) {
-			if ($lastSession === null || $lastSession->last_activity <= $session->last_activity) {
+			if ($lastSession === null || ($session->last_activity && ($lastSession->last_activity === null || $lastSession->last_activity <= $session->last_activity))) {
 				$lastSession = $session;
 			}
 		}
