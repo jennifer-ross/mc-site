@@ -157,7 +157,7 @@ class Message extends Model
 	/**
 	 * Get the MessageAttachment attribute.
 	 *
-	 * @return Chat|null
+	 * @return MessageAttachment|null
 	 */
 	public function getMessageAttachmentAttribute(): ?MessageAttachment
 	{
