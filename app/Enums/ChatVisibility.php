@@ -5,6 +5,6 @@ namespace App\Enums;
 
 enum ChatVisibility: string
 {
-	case Private = 'private';
-	case Public = 'public';
+	case PrivateVisibility = 'private';
+	case PublicVisibility = 'public';
 }

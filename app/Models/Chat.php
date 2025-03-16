@@ -179,7 +179,7 @@ class Chat extends Model
 
 	public function isPrivateChat(): bool
 	{
-		return $this->visibility === ChatVisibility::Private;
+		return $this->visibility === ChatVisibility::PrivateVisibility;
 	}
 
 	public function getIsPublicChatAttribute(): bool
@@ -189,7 +189,7 @@ class Chat extends Model
 
 	public function isPublicChat(): bool
 	{
-		return $this->visibility === ChatVisibility::Public;
+		return $this->visibility === ChatVisibility::PublicVisibility;
 	}
 
 	public function getIsPrivateAttribute(): bool
@@ -199,7 +199,7 @@ class Chat extends Model
 
 	public function isPrivate(): bool
 	{
-		return $this->type === ChatType::Private;
+		return $this->type === ChatType::PrivateChat;
 	}
 
 	public function getIsGroupAttribute(): bool
@@ -209,7 +209,7 @@ class Chat extends Model
 
 	public function isGroup(): bool
 	{
-		return $this->type === ChatType::Group;
+		return $this->type === ChatType::GroupChat;
 	}
 
 	public function getIsCourtAttribute(): bool
