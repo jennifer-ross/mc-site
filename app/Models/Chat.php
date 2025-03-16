@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -133,10 +132,9 @@ class Chat extends Model
         ]);
     }
 
-    public function participants(): HasManyThrough
+    public function participants(): HasMany
     {
-        return $this->hasManyThrough(ChatParticipant::class, User::class, 'user_id', 'chat_id', 'id', 'chat_id');
-        //		return $this->hasMany(ChatParticipant::class);
+		return $this->hasMany(ChatParticipant::class);
     }
 
     /**

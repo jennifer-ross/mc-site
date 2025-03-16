@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
-use Nette\Utils\Image as NetteImage;
 
 /**
  * @property int $id
@@ -54,7 +53,7 @@ class MessageAttachment extends Model
      */
     public function image(): BelongsTo
     {
-        return $this->belongsTo(NetteImage::class, 'image_id');
+        return $this->belongsTo(Media::class, 'image_id');
     }
 
     /**
