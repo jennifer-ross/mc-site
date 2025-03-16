@@ -118,7 +118,7 @@ class Message extends Model
             explode("\n", Arr::get($excerpt, 'data.content', ''))
         )->first();
 
-        return Str::limit($excerpt, 21);
+        return Str::limit($excerpt ?? '', 21);
     }
 
 	/**

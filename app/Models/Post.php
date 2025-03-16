@@ -151,7 +151,7 @@ class Post extends Model
             explode("\n", Arr::get($excerpt, 'data.content', ''))
         )->first();
 
-        return Str::limit($excerpt, 160);
+		return Str::limit($excerpt ?? '', 100);
     }
 
     /**
