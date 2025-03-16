@@ -25,6 +25,11 @@ class ChatService
 
 	public function updateChats(): void
 	{
+		if (!Auth::check()) {
+			$this->chats = [];
+			return;
+		}
+
 		$userId = Auth::id();
 
 		$usersCacheKey = User::getClassName().":{$userId}:".ChatParticipant::getClassName();
