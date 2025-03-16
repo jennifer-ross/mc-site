@@ -10,11 +10,12 @@ class PostPolicy
 {
     use HandlesAuthorization;
 
-	private function isPostOwner(User $user, Post $post)
+	private function isPostOwner(User $user, Post $post): bool
 	{
 		if ($user->id !== $post->user->id) {
 			return false;
 		}
+		return true;
 	}
 
     /**
