@@ -51,7 +51,7 @@ class MessagePolicy
 			return false;
 		}
 
-		if ($user->id !== $message->sender->id) {
+		if (!$message->sender || $user->id !== $message->sender->id) {
 			return false;
 		}
 
