@@ -40,9 +40,7 @@ class Show extends Component
 	 */
     public function mount(ChatService $chatService, int $chatId): void
 	{
-        $this->currentChat = Cache::rememberForever("chats:{$chatId}", function () use ($chatId) {
-			return Chat::whereId($chatId)->firstOrFail();
-		});
+		$this->currentChat = Chat::getFromCacheById($chatId);
 		$this->chats = $chatService->getChats();
     }
 
